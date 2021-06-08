@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block title %}
+Iris Species Guesser
+{% endblock %}
+{% block content %}
+<div class="row justify-content-md-center mt-5 mb-5">
+    <div class="col-md-4">
+        <form>
+            <div class="mb-3">
+                <label for="sepalLength" class="form-label">Sepal Length</label>
+                <input type="number" class="form-control" id="sepalLength" step="0.01">
+            </div>
+            <div class="mb-3">
+                <label for="sepalWidth" class="form-label">Sepal Width</label>
+                <input type="number" class="form-control" id="sepalWidth" step="0.01">
+            </div>
+            <div class="mb-3">
+                <label for="petalLength" class="form-label">Petal Length</label>
+                <input type="number" class="form-control" id="petalLength" step="0.01">
+            </div>
+            <div class="mb-3">
+                <label for="petalWidth" class="form-label">Petal Width</label>
+                <input type="number" class="form-control" id="petalWidth" step="0.01">
+            </div>
+            <div class="row">
+                <div class="col-2">
+                    <button type="submit" class="btn btn-primary" id="formSubmit">Submit</button>
+                </div>
+                <div class="col-10">
+                    <div id="predictedSpecies">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    function submitForm(event) {
+        event.preventDefault();
+
+        var errorHtml = "<h3><span class='badge bg-danger'>There was an error retrieving the species prediction.</span></h3>";
+
+        var sepalLength = document.getElementById("sepalLength").value;
+        var sepalWidth = document.getElementById("sepalWidth").value;
+        var petalLength = document.getElementById("petalLength").value;
+        var petalWidth = document.getElementById("petalWidth").value;
+
+        if (sepalLength === "" || sepalWidth === "" || petalLength === "" || petalWidth === "") {
+            document.getElementById("predictedSpecies").innerHTML = errorHtml;
+        }
+        else {
+            fetch(`/api/iris/?sepal_length=${sepalLength}&sepal_width=${sepalWidth}&petal_length=${petalLength}&petal_width=${petalWidth}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("predictedSpecies").innerHTML = `<h3><span class='badge bg-success'>${data.species}</span></h3>`;
+                }).catch(error => {
+                    document.getElementById("predictedSpecies").innerHTML = errorHtml;
+                });
+        }
+    }
+
+    (function () {
+        document.getElementById("formSubmit").addEventListener("click", submitForm);
+    })();
+</script>
+{% endblock %}
